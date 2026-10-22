@@ -1,0 +1,15 @@
+node_modules/
+
+# Local environment. Commit an .env.example if you add one.
+.env
+.env.*
+!.env.example
+
+# Local SQLite database and its sidecar files
+dev.db
+dev.db-journal
+dev.db-wal
+dev.db-shm
+
+# Prisma Client output from prisma/schema.prisma
+/generated/prisma

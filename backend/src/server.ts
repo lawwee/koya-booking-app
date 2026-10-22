@@ -1,7 +1,8 @@
 import express, { type NextFunction, type Request, type Response } from 'express';
 import cors from 'cors';
 
-import { connectDB } from './config/database.config.js';
+import { connectDB } from './config/database.config';
+import apiRoutes from './routes/index.route';
 
 const app = express();
 app.use(cors());
@@ -14,6 +15,8 @@ const start = async () => {
     app.get('/', (request, response) => {
         response.send('Hello, Koya!');
     });
+
+    app.use('/api', apiRoutes);
 
     app.use((error: Error, _request: Request, response: Response, _next: NextFunction) => {
         response.status(500).json({ error: error.message || 'Internal Server Error' });

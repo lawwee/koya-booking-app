@@ -25,6 +25,18 @@ export class BookingService {
     async createBooking(booking: CreateBookingDto): Promise<BookingDto> {
         try {
             const created = await prisma.$transaction(async (tx) => {
+                const slot = await tx.slot.findUnique({
+                    where: { id: booking.slot_id },
+                });
+
+                if (!slot) {
+                    throw new HttpError("Slot not found", 404);
+                }
+
+                if (slot.start.getTime() <= Date.now()) {
+                    throw new HttpError("Slot has already started", 400);
+                }
+
                 const claimed = await tx.slot.updateMany({
                     where: {
                         id: booking.slot_id,
@@ -36,12 +48,6 @@ export class BookingService {
                 });
 
                 if (claimed.count !== 1) {
-                    const slot = await tx.slot.findUnique({
-                        where: { id: booking.slot_id },
-                    });
-                    if (!slot) {
-                        throw new HttpError("Slot not found", 404);
-                    }
                     throw new HttpError("Slot is no longer available", 409);
                 }
 

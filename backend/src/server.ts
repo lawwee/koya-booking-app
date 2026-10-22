@@ -1,14 +1,41 @@
-import express, { type NextFunction, type Request, type Response } from 'express';
-import cors from 'cors';
+import "dotenv/config";
+import { timingSafeEqual } from "node:crypto";
+import express, { type NextFunction, type Request, type Response } from "express";
+import cors from "cors";
 
-import { connectDB } from './config/database.config';
-import apiRoutes from './routes/index.route';
-import { HttpError } from './utils/http-error';
+import { connectDB } from "./config/database.config";
+import apiRoutes from "./routes/index.route";
+import { HttpError } from "./utils/http-error";
+
+const configuredApiKey = process.env.API_KEY;
+if (!configuredApiKey) {
+    console.error("API_KEY is not set");
+    process.exit(1);
+}
+const apiKey: string = configuredApiKey;
+
+function apiKeyMatches(provided: string): boolean {
+    const providedKey = Buffer.from(provided);
+    const expectedKey = Buffer.from(apiKey);
+    if (providedKey.length !== expectedKey.length) {
+        return false;
+    }
+    return timingSafeEqual(providedKey, expectedKey);
+}
 
 const app = express();
 app.use(cors());
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
+
+app.use((request, response, next) => {
+    const provided = request.header("x-api-key");
+    if (!provided || !apiKeyMatches(provided)) {
+        response.status(401).json({ error: "Unauthorized" });
+        return;
+    }
+    next();
+});
 
 const start = async () => {
     await connectDB();

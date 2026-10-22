@@ -3,6 +3,7 @@ import cors from 'cors';
 
 import { connectDB } from './config/database.config';
 import apiRoutes from './routes/index.route';
+import { HttpError } from './utils/http-error';
 
 const app = express();
 app.use(cors());
@@ -18,8 +19,12 @@ const start = async () => {
 
     app.use('/api', apiRoutes);
 
-    app.use((error: Error, _request: Request, response: Response, _next: NextFunction) => {
-        response.status(500).json({ error: error.message || 'Internal Server Error' });
+    app.use((error: unknown, _request: Request, response: Response, _next: NextFunction) => {
+        const message = error instanceof Error && error.message.length > 0
+            ? error.message
+            : "Internal Server Error";
+        const statusCode = error instanceof HttpError ? error.statusCode : 500;
+        response.status(statusCode).json({ error: message });
     });
 
     const PORT = process.env.PORT || 5000;

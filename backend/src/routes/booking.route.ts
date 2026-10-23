@@ -36,5 +36,19 @@ router
             return next(error);
         }
     })
+    .delete("/:id", async (request, response, next) => {
+        try {
+            const id = request.params.id;
+            if (typeof id !== "string" || id.length === 0) {
+                throw new HttpError("Booking not found", 404);
+            }
+
+            const booking = await bookingService.cancelBooking(id);
+            response.status(200).json(booking);
+        } catch (error) {
+            return next(error);
+        }
+    })
+
 
 export default router;

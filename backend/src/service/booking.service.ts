@@ -72,6 +72,46 @@ export class BookingService {
         }
     }
 
+    async cancelBooking(id: string): Promise<BookingDto> {
+        try {
+            const cancelled = await prisma.$transaction(async (tx) => {
+                const booking = await tx.booking.findUnique({
+                    where: { id },
+                });
+
+                if (!booking) {
+                    throw new HttpError("Booking not found", 404);
+                }
+
+                if (booking.status === BookingStatus.CANCELLED) {
+                    throw new HttpError("Booking is already cancelled", 400);
+                }
+
+                const updated = await tx.booking.update({
+                    where: { id },
+                    data: {
+                        status: BookingStatus.CANCELLED,
+                    },
+                });
+
+                await tx.slot.update({
+                    where: { id: booking.slot_id },
+                    data: { available: true },
+                });
+
+                return updated;
+            });
+
+            return this.mapBookingToDto(cancelled);
+        } catch (error) {
+            if (error instanceof HttpError) {
+                throw error;
+            }
+            console.error(error);
+            throw new HttpError("error cancelling booking", 500);
+        }
+    }
+
     async getBooking(id: string): Promise<BookingDto> {
         try {
             const booking = await prisma.booking.findUnique({

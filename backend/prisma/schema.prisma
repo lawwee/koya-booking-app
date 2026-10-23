@@ -24,12 +24,12 @@ model Slot {
 }
 
 model Booking {
-  id          String   @id @unique
-  slot_id     String
-  slot        Slot     @relation(fields: [slot_id], references: [id])
-  name        String
-  email       String
-  status      String   @default("pending")
-  createdAt   DateTime @default(now())
-  updatedAt   DateTime @updatedAt
+  id        String   @id @unique
+  slot_id   String
+  slot      Slot     @relation(fields: [slot_id], references: [id])
+  name      String
+  email     String
+  status    String   @default("pending")
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
 }

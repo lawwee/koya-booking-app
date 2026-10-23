@@ -30,7 +30,6 @@ export class BookingService {
             email: booking.email,
             status: booking.status,
             created_at: booking.createdAt.toISOString(),
-            updatedAt: booking.updatedAt.toISOString(),
         });
     }
 

@@ -4,8 +4,7 @@ export class SlotDto {
     start: string;
     end: string;
     available: boolean;
-    createdAt: string;
-    updatedAt: string;
+    created_at: string;
 
     constructor(slot: SlotDto) {
         this.id = slot.id;
@@ -13,7 +12,6 @@ export class SlotDto {
         this.start = slot.start;
         this.end = slot.end;
         this.available = slot.available;
-        this.createdAt = slot.createdAt;
-        this.updatedAt = slot.updatedAt;
+        this.created_at = slot.created_at;
     }
 }

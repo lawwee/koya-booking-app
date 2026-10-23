@@ -20,3 +20,7 @@ export function bookingAttemptRetryAfter(email: string): number | undefined {
     attempts.set(email, recent);
     return undefined;
 }
+
+export function clearBookingAttempts(): void {
+    attempts.clear();
+}

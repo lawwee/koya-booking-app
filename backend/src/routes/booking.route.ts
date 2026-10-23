@@ -54,7 +54,7 @@ router
     })
     .post("/", async (request, response, next) => {
         try {
-            const idempotencyKey = idempotencyKeyFrom(request.header("idempotency-key"));
+            const idempotencyKey = idempotencyKeyFrom(request.header("Idempotency-Key"));
             const requestHash = idempotencyKey === undefined ? undefined : hashRequestBody(request.body);
             const idempotency = idempotencyKey !== undefined && requestHash !== undefined
                 ? { key: idempotencyKey, requestHash }

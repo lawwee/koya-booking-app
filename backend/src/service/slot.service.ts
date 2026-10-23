@@ -10,8 +10,7 @@ export class SlotService {
             start: slot.start.toISOString(),
             end: slot.end.toISOString(),
             available: slot.available,
-            createdAt: slot.createdAt.toISOString(),
-            updatedAt: slot.updatedAt.toISOString(),
+            created_at: slot.createdAt.toISOString(),
         });
     }
 

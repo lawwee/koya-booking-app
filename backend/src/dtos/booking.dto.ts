@@ -16,7 +16,7 @@ export class BookingDto {
     name: string;
     email: string;
     status: string;
-    createdAt: string;
+    created_at: string;
     updatedAt: string;
 
     constructor(booking: BookingDto) {
@@ -25,7 +25,7 @@ export class BookingDto {
         this.name = booking.name;
         this.email = booking.email;
         this.status = booking.status;
-        this.createdAt = booking.createdAt;
+        this.created_at = booking.created_at;
         this.updatedAt = booking.updatedAt;
     }
 }

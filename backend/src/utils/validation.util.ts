@@ -3,7 +3,7 @@ import { z, type ZodError } from "zod";
 
 export const emailSchema = z.email("Enter a valid email address");
 
-export function handleValidationError(error: ZodError, response: Response) {
+export function validationErrorMessage(error: ZodError): string {
     const message = error.issues
         .map((issue) => {
             const field = issue.path.map(String).join(".");
@@ -11,7 +11,11 @@ export function handleValidationError(error: ZodError, response: Response) {
         })
         .join("; ");
 
+    return message.length > 0 ? message : "Validation failed";
+}
+
+export function handleValidationError(error: ZodError, response: Response) {
     return response.status(400).json({
-        error: message.length > 0 ? message : "Validation failed",
+        error: validationErrorMessage(error),
     });
 }

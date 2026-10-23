@@ -32,4 +32,14 @@ model Booking {
   status    String   @default("pending")
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
+
+  @@index([email, createdAt, id])
+}
+
+model IdempotencyRecord {
+  key          String   @id
+  requestHash  String
+  statusCode   Int
+  responseBody String
+  createdAt    DateTime @default(now())
 }

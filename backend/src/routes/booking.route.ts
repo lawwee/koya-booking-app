@@ -1,13 +1,38 @@
 import express from "express";
 import { BookingService } from "../service/booking.service";
 import { CreateBookingSchema } from "../validation/create-booking.validation";
-import { handleValidationError } from "../utils/validation.util";
+import { ListBookingsSchema } from "../validation/list-bookings.validation";
+import { handleValidationError, validationErrorMessage } from "../utils/validation.util";
+import { hashRequestBody } from "../utils/idempotency.util";
 import { HttpError } from "../utils/http-error";
 
 const router = express.Router();
 const bookingService = new BookingService();
 
+function idempotencyKeyFrom(header: string | undefined): string | undefined {
+    if (header === undefined) {
+        return undefined;
+    }
+    if (header.trim().length === 0) {
+        throw new HttpError("Idempotency-Key is empty", 400);
+    }
+    return header;
+}
+
 router
+    .get("/", async (request, response, next) => {
+        try {
+            const { error, data } = ListBookingsSchema.safeParse(request.query);
+            if (error) {
+                return handleValidationError(error, response);
+            }
+
+            const bookings = await bookingService.listBookings(data);
+            response.status(200).json(bookings);
+        } catch (error) {
+            return next(error);
+        }
+    })
     .get("/:id", async (request, response, next) => {
         try {
             const id = request.params.id;
@@ -23,15 +48,27 @@ router
     })
     .post("/", async (request, response, next) => {
         try {
+            const idempotencyKey = idempotencyKeyFrom(request.header("idempotency-key"));
+            const requestHash = idempotencyKey === undefined ? undefined : hashRequestBody(request.body);
+            const idempotency = idempotencyKey !== undefined && requestHash !== undefined
+                ? { key: idempotencyKey, requestHash }
+                : undefined;
             const { error, data } = CreateBookingSchema.safeParse(request.body);
             
             if (error) {
+                if (idempotency) {
+                    const result = await bookingService.storeIdempotentResult(idempotency, {
+                        statusCode: 400,
+                        body: { error: validationErrorMessage(error) },
+                    });
+                    response.status(result.statusCode).json(result.body);
+                    return;
+                }
                 return handleValidationError(error, response);
             }
-    
-            const booking = await bookingService.createBooking(data);
-            response.status(201).json(booking);
-    
+
+            const result = await bookingService.createBooking(data, idempotency);
+            response.status(result.statusCode).json(result.body);
         } catch (error) {
             return next(error);
         }

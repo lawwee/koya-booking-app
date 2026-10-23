@@ -1,0 +1,164 @@
+/* Forms */
+
+label {
+  display: flex;
+  flex-direction: column;
+  gap: 0.25rem;
+  font-size: 0.9rem;
+  color: var(--mut);
+}
+
+input {
+  font: inherit;
+  padding: 0.5rem 0.6rem;
+  border: 1px solid var(--bd);
+  border-radius: 6px;
+  background: var(--card);
+  color: var(--fg);
+  min-width: 0;
+}
+
+/* Buttons */
+
+button,
+.btn {
+  font: inherit;
+  padding: 0.5rem 0.9rem;
+  border-radius: 6px;
+  border: 1px solid var(--ac);
+  background: var(--ac);
+  color: var(--acf);
+  cursor: pointer;
+  text-decoration: none;
+  display: inline-block;
+}
+
+button.alt {
+  background: transparent;
+  color: var(--fg);
+  border-color: var(--bd);
+}
+
+button.danger {
+  background: var(--dg);
+  border-color: var(--dg);
+  color: #fff;
+}
+
+button:disabled {
+  opacity: 0.6;
+  cursor: wait;
+}
+
+/* Tables */
+
+.scroll {
+  overflow-x: auto;
+  border: 1px solid var(--bd);
+  border-radius: 8px;
+  background: var(--card);
+}
+
+table {
+  border-collapse: collapse;
+  width: 100%;
+  font-size: 0.92rem;
+}
+
+th,
+td {
+  text-align: left;
+  padding: 0.55rem 0.7rem;
+  border-bottom: 1px solid var(--bd);
+  white-space: nowrap;
+}
+
+th {
+  color: var(--mut);
+  font-weight: 600;
+}
+
+tr:last-child td {
+  border-bottom: 0;
+}
+
+td input {
+  width: 100%;
+  min-width: 9rem;
+}
+
+/* Messages and hints */
+
+.msg {
+  padding: 0.6rem 0.8rem;
+  border-radius: 6px;
+  margin: 0.5rem 0;
+}
+
+.err {
+  background: var(--dgb);
+  color: var(--dg);
+}
+
+.ok {
+  background: var(--okb);
+  color: var(--ok);
+}
+
+.hint,
+.empty {
+  color: var(--mut);
+}
+
+.empty {
+  padding: 1.5rem 0;
+}
+
+.dgt {
+  color: var(--dg);
+}
+
+/* Status badges */
+
+.b {
+  padding: 0.1rem 0.5rem;
+  border-radius: 99px;
+  font-size: 0.82rem;
+  border: 1px solid var(--bd);
+}
+
+.b.g,
+.b.confirmed {
+  background: var(--okb);
+  color: var(--ok);
+  border-color: transparent;
+}
+
+.b.x,
+.b.cancelled {
+  background: var(--dgb);
+  color: var(--dg);
+  border-color: transparent;
+}
+
+/* Detail list */
+
+dl {
+  display: grid;
+  grid-template-columns: max-content 1fr;
+  gap: 0.4rem 1.25rem;
+  background: var(--card);
+  border: 1px solid var(--bd);
+  border-radius: 8px;
+  padding: 1rem;
+  margin: 0 0 1rem;
+}
+
+dt {
+  color: var(--mut);
+}
+
+dd {
+  margin: 0;
+  overflow-wrap: anywhere;
+}

@@ -1,10 +1,16 @@
 import express from "express";
+import zod from "zod";
 import { BookingService } from "../service/booking.service";
 import { CreateBookingSchema } from "../validation/create-booking.validation";
 import { ListBookingsSchema } from "../validation/list-bookings.validation";
-import { handleValidationError, validationErrorMessage } from "../utils/validation.util";
+import { bookingAttemptRetryAfter } from "../utils/booking-rate-limit.util";
+import { emailSchema, handleValidationError, validationErrorMessage } from "../utils/validation.util";
 import { hashRequestBody } from "../utils/idempotency.util";
 import { HttpError } from "../utils/http-error";
+
+const attemptEmailSchema = zod.object({
+    email: zod.string().trim().min(1).toLowerCase().pipe(emailSchema),
+});
 
 const router = express.Router();
 const bookingService = new BookingService();
@@ -53,6 +59,16 @@ router
             const idempotency = idempotencyKey !== undefined && requestHash !== undefined
                 ? { key: idempotencyKey, requestHash }
                 : undefined;
+            const attemptEmail = attemptEmailSchema.safeParse(request.body);
+            if (attemptEmail.success) {
+                const retryAfter = bookingAttemptRetryAfter(attemptEmail.data.email);
+                if (retryAfter !== undefined) {
+                    response.set("Retry-After", String(retryAfter));
+                    response.status(429).json({ error: "Too many booking attempts" });
+                    return;
+                }
+            }
+
             const { error, data } = CreateBookingSchema.safeParse(request.body);
             
             if (error) {

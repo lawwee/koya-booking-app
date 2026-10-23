@@ -14,8 +14,9 @@ export class SlotService {
         });
     }
 
-    async allSlots(): Promise<SlotDto[]> {
+    async allSlots(provider: string | undefined): Promise<SlotDto[]> {
         const slots = await prisma.slot.findMany({
+            where: provider === undefined ? {} : { provider },
             orderBy: { start: "asc" },
         });
 

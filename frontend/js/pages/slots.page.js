@@ -1,4 +1,4 @@
-import { api } from '../api/mock-api.js';
+import { api } from '../api/koya-api.js';
 import { errorMessage, escapeHtml, timeTag } from '../utils/html.js';
 import { $, navigate, render } from '../utils/view.js';
 
@@ -37,13 +37,13 @@ function slotsTable(slots) {
 }
 
 export async function renderSlotsPage(query) {
-  const hasProvider = query.has('provider');
+  const provider = query.get('provider') || '';
 
   render(`
     <h1>Slots</h1>
     <form id="slot-filter" class="row">
       <label>Doctor
-        <input name="provider" value="${escapeHtml(query.get('provider') || '')}" placeholder="Dr Ada">
+        <input name="provider" value="${escapeHtml(provider)}" placeholder="Dr Ada">
       </label>
       <button>Filter</button>
       <a class="btn alt" href="#/slots">Clear</a>
@@ -59,14 +59,14 @@ export async function renderSlotsPage(query) {
 
   const output = $('#slots-output');
   try {
-    const slots = await api.listSlots(hasProvider ? query.get('provider') : undefined);
+    const slots = await api.listSlots(provider || undefined);
     if (slots.length) {
       output.innerHTML = slotsTable(slots);
     } else {
-      const suffix = hasProvider ? ' for that doctor.' : '. Add slots on the Reset page.';
+      const suffix = provider ? ' for that doctor.' : '. Add slots on the Reset page.';
       output.innerHTML = `<p class="empty">No slots found${suffix}</p>`;
     }
   } catch (error) {
-    output.innerHTML = errorMessage(error.message);
+    output.innerHTML = errorMessage(error);
   }
 }

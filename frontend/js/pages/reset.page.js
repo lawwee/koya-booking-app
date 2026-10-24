@@ -1,4 +1,4 @@
-import { api } from '../api/mock-api.js';
+import { api } from '../api/koya-api.js';
 import { fromLocalInputValue, toLocalInputValue } from '../utils/format.js';
 import { errorMessage, escapeHtml } from '../utils/html.js';
 import { $, navigate, render, setFlash } from '../utils/view.js';
@@ -25,7 +25,13 @@ function readSlotRow(row) {
 }
 
 export async function renderResetPage() {
-  const currentSlots = await api.listSlots();
+  let currentSlots;
+  try {
+    currentSlots = await api.listSlots();
+  } catch (error) {
+    render(`<h1 class="dgt">Reset</h1>${errorMessage(error)}`);
+    return;
+  }
 
   render(`
     <h1 class="dgt">Reset</h1>
@@ -82,7 +88,7 @@ export async function renderResetPage() {
       setFlash(result.message);
       navigate('#/slots');
     } catch (error) {
-      $('#reset-error').innerHTML = errorMessage(error.message);
+      $('#reset-error').innerHTML = errorMessage(error);
       showConfirm(false);
     }
   };

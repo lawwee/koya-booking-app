@@ -1,4 +1,4 @@
-import { api } from '../api/mock-api.js';
+import { api } from '../api/koya-api.js';
 import { errorMessage, escapeHtml } from '../utils/html.js';
 import { $, navigate, render, setFlash } from '../utils/view.js';
 
@@ -40,7 +40,7 @@ export function renderBookPage(query) {
       setFlash(`Booking created. Your booking id is ${booking.id}.`);
       navigate(`#/bookings/${encodeURIComponent(booking.id)}`);
     } catch (error) {
-      $('#booking-error').innerHTML = errorMessage(error.message);
+      $('#booking-error').innerHTML = errorMessage(error);
     }
 
     submitButton.disabled = false;

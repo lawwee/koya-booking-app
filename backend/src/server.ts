@@ -1,5 +1,6 @@
 import "dotenv/config";
 import { timingSafeEqual } from "node:crypto";
+import { fileURLToPath } from "node:url";
 import express, { type NextFunction, type Request, type Response } from "express";
 import cors from "cors";
 
@@ -14,6 +15,8 @@ if (!configuredApiKey) {
 }
 const apiKey: string = configuredApiKey;
 
+const frontendDir = fileURLToPath(new URL("../../frontend", import.meta.url));
+
 function apiKeyMatches(provided: string): boolean {
     const providedKey = Buffer.from(provided);
     const expectedKey = Buffer.from(apiKey);
@@ -23,28 +26,25 @@ function apiKeyMatches(provided: string): boolean {
     return timingSafeEqual(providedKey, expectedKey);
 }
 
-const app = express();
-app.use(cors());
-app.use(express.json());
-app.use(express.urlencoded({ extended: true }));
-
-app.use((request, response, next) => {
+function requireApiKey(request: Request, response: Response, next: NextFunction) {
     const provided = request.header("x-api-key");
     if (!provided || !apiKeyMatches(provided)) {
         response.status(401).json({ error: "Unauthorized" });
         return;
     }
     next();
-});
+}
+
+const app = express();
+app.use(cors());
+app.use(express.json());
+app.use(express.urlencoded({ extended: true }));
 
 const start = async () => {
     await connectDB();
 
-    app.get('/', (request, response) => {
-        response.send('Hello, Koya!');
-    });
-
-    app.use('/api', apiRoutes);
+    app.use(express.static(frontendDir));
+    app.use('/api', requireApiKey, apiRoutes);
 
     app.use((error: unknown, _request: Request, response: Response, _next: NextFunction) => {
         const message = error instanceof Error && error.message.length > 0
@@ -61,4 +61,3 @@ const start = async () => {
 };
 
 start();
-

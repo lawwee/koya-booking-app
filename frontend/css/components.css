@@ -100,6 +100,11 @@ td input {
   color: var(--dg);
 }
 
+.msg a {
+  color: inherit;
+  font-weight: 600;
+}
+
 .ok {
   background: var(--okb);
   color: var(--ok);

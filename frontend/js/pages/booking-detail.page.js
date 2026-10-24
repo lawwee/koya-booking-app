@@ -1,4 +1,4 @@
-import { api } from '../api/mock-api.js';
+import { api } from '../api/koya-api.js';
 import { errorMessage, escapeHtml, statusBadge, timeTag } from '../utils/html.js';
 import { $, navigate, refresh, render, setFlash } from '../utils/view.js';
 
@@ -55,10 +55,10 @@ export async function renderBookingDetailPage(bookingId) {
         setFlash('Booking cancelled. The slot is available again.');
         refresh();
       } catch (error) {
-        $('#cancel-error').innerHTML = errorMessage(error.message);
+        $('#cancel-error').innerHTML = errorMessage(error);
       }
     };
   } catch (error) {
-    output.innerHTML = errorMessage(error.message);
+    output.innerHTML = errorMessage(error);
   }
 }

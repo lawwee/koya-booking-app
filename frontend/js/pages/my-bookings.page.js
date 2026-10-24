@@ -1,4 +1,4 @@
-import { api } from '../api/mock-api.js';
+import { api } from '../api/koya-api.js';
 import { errorMessage, escapeHtml, statusBadge, timeTag } from '../utils/html.js';
 import { $, navigate, render } from '../utils/view.js';
 
@@ -74,24 +74,20 @@ export async function renderMyBookingsPage(query) {
 
   const output = $('#bookings-output');
   try {
-    const page = await api.listBookings({
-      email,
-      limit: query.has('limit') ? query.get('limit') : undefined,
-      cursor,
-    });
+    const page = await api.listBookings({ email, limit, cursor });
 
-    if (!page.items.length) {
+    if (!page.bookings.length) {
       output.innerHTML = `<p class="empty">No bookings found for ${escapeHtml(email.trim().toLowerCase())}.</p>`;
       return;
     }
 
-    output.innerHTML = bookingsTable(page.items) + pagination({
+    output.innerHTML = bookingsTable(page.bookings) + pagination({
       email,
       limit,
       isFirstPage: !cursor,
-      nextCursor: page.has_next ? page.next_cursor : null,
+      nextCursor: page.next_cursor,
     });
   } catch (error) {
-    output.innerHTML = errorMessage(error.message);
+    output.innerHTML = errorMessage(error);
   }
 }
